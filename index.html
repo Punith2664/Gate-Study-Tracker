@@ -11,27 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title h2" id="welcomeModalLabel">Welcome to Your GATE Tracker!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Here’s a quick guide to all the features:</p>
-                    <ul>
-                        <li><strong>Study Timer:</strong> Use the Pomodoro timer for focused study sessions. It logs your time automatically when it finishes.</li>
-                        <li><strong>Study Statistics:</strong> Tracks your study hours for today, the last 7 days, the last 30 days, and overall.</li>
-                        <li><strong>Revision Tracker:</strong> After completing all chapters in a subject, an option to start a revision cycle will appear. The app will then tell you when it's time to revise.</li>
-                        <li><strong>Daily Tools:</strong> Use the To-Do List, Workout Tracker, and Activity Logs to build discipline and consistency.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="login-container" class="container vh-100 d-flex flex-column justify-content-center align-items-center">
         <h1 class="display-4 fw-bold text-primary text-center mb-4">GATE EC Study Tracker</h1>
         <button id="login-btn" class="btn btn-outline-primary btn-lg px-5">Login with Google</button>
@@ -60,9 +39,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
-
     <script src="config.js"></script>
-    
     <script src="script.js"></script>
 </body>
 </html>
