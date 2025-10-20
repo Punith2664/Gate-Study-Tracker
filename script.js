@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-   const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -94,16 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
         (appData.todos || []).forEach((task, index) => {
             const li = document.createElement('li');
             li.className = `py-3 border-b border-border-color flex items-center gap-4`;
-            if (task.completed) li.classList.add('line-through', 'text-gray-500');
             
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox'; checkbox.checked = task.completed; checkbox.id = `todo-${index}`;
-            checkbox.className = 'chapter-checkbox';
+            checkbox.className = 'chapter-checkbox'; // Using same style as chapter checkbox
             checkbox.onchange = () => { appData.todos[index].completed = checkbox.checked; renderTodos(); saveData(); };
             
             const label = document.createElement('label');
             label.htmlFor = `todo-${index}`; label.textContent = task.text;
-            label.className = 'flex-grow';
+            label.className = `flex-grow ${task.completed ? 'line-through text-gray-500' : ''}`;
 
             const deleteBtn = document.createElement('button');
             deleteBtn.innerHTML = `&times;`;
@@ -130,11 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const subjectContainer=document.getElementById('subject-container'),revisionList=document.getElementById('revision-list'),performanceChart=document.querySelector('.performance-chart'),chartPercentageLabel=document.getElementById('chart-percentage');
     function runAllRenders(){renderSubjectsAndProgress();renderRevisionsDue();updateStatsDisplay();updateWorkoutDisplay();updateLoginStats()}
     function renderRevisionsDue(){revisionList.innerHTML='';const e=new Date;e.setHours(23,59,59,999);let t=0;Object.keys(appData.subjects||{}).forEach(a=>{const s=appData.subjects[a];if(s.dueDate&&new Date(s.dueDate)<=e){const e=document.createElement("li");e.className="py-2 border-b border-border-color flex justify-between",e.innerHTML=`<span>${a}</span> <span class="text-gray-400 text-sm">(Revision ${s.revisionStage})</span>`,revisionList.appendChild(e),t++}}),0===t&&(revisionList.innerHTML='<li class="py-2 text-gray-400">No revisions due today. Well done!</li>')}
+    
+    // --- THIS IS THE CORRECTED FUNCTION ---
     function renderSubjectsAndProgress() {
         subjectContainer.innerHTML = '';
         let totalChapters = 0, completedChapters = 0;
 
-        Object.keys(appData.subjects).forEach(name => {
+        subjectNames.forEach(name => {
             const subject = appData.subjects[name];
             const subjectCard = document.createElement('div');
             subjectCard.className = 'bg-card border border-border-color rounded-lg p-4 flex flex-col';
@@ -148,14 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tagText = subject.revisionStage > revisionIntervals.length ? 'Done' : `R${subject.revisionStage}`;
                 revisionHTML = `<span class="text-xs font-bold border border-primary text-primary px-2 py-1 rounded-full">${tagText}</span>`;
             }
-
-            let actionButtonHTML = '';
-            const allChaptersDone = chapters.length > 0 && chapters.filter(c => c.completed).length === chapters.length;
-            if (allChaptersDone) {
-                if (subject.revisionStage === 0) actionButtonHTML = `<button class="card-btn w-full mt-4 subject-revision-btn" data-subject-name="${name}">Start Revision Cycle</button>`;
-                else if (subject.revisionStage <= revisionIntervals.length) actionButtonHTML = `<button class="card-btn w-full mt-4 subject-revision-btn" data-subject-name="${name}">Finish Revision ${subject.revisionStage}</button>`;
-            }
-
+            
             subjectCard.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-bold">${name}</h4>
@@ -166,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="text" placeholder="Add new chapter..." class="flex-grow bg-dark border border-border-color p-2 rounded-l-md focus:outline-none focus:border-primary text-sm">
                     <button class="card-btn text-sm rounded-l-none">Add</button>
                 </div>
-                ${actionButtonHTML}
             `;
 
             const chapterList = subjectCard.querySelector('.chapter-list');
@@ -176,16 +169,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'flex items-center gap-3';
                 const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox'; checkbox.checked = chapter.completed; checkbox.id = `${name}-${index}`;
+                checkbox.type = 'checkbox'; checkbox.checked = chapter.completed; checkbox.id = `${name.replace(/\s+/g, '-')}-${index}`;
                 checkbox.className = 'chapter-checkbox';
                 checkbox.onchange = () => { appData.subjects[name].chapters[index].completed = checkbox.checked; runAllRenders(); saveData(); };
                 const label = document.createElement('label');
-                label.htmlFor = `${name}-${index}`; label.textContent = chapter.text;
+                label.htmlFor = `${name.replace(/\s+/g, '-')}-${index}`; label.textContent = chapter.text;
                 if(chapter.completed) label.classList.add('line-through', 'text-gray-500');
                 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.innerHTML = `&times;`;
-                deleteBtn.className = 'bg-transparent text-danger text-xl font-bold hover:text-red-400 transition-colors';
+                deleteBtn.className = 'bg-transparent text-danger text-xl font-bold hover:text-red-400 transition-colors p-0 leading-none';
                 deleteBtn.onclick = () => { appData.subjects[name].chapters.splice(index, 1); runAllRenders(); saveData(); };
                 
                 contentDiv.appendChild(checkbox); contentDiv.appendChild(label);
@@ -197,16 +190,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const input = subjectCard.querySelector('.chapter-input input');
                 if (input.value.trim()) { (appData.subjects[name].chapters = appData.subjects[name].chapters || []).push({ text: input.value.trim(), completed: false }); input.value = ''; runAllRenders(); saveData(); }
             };
-            const actionButton = subjectCard.querySelector('.subject-revision-btn');
-            if (actionButton) {
-                actionButton.onclick = (e) => {
-                    const subjectName = e.target.getAttribute('data-subject-name');
-                    appData.subjects[subjectName].revisionStage++;
-                    const nextInterval = revisionIntervals[appData.subjects[subjectName].revisionStage - 1];
-                    if (nextInterval) { const d = new Date(); d.setDate(d.getDate() + nextInterval); appData.subjects[subjectName].dueDate = d.toISOString(); } else { appData.subjects[subjectName].dueDate = null; }
-                    runAllRenders(); saveData();
-                };
+            
+            const allChaptersDone = chapters.length > 0 && chapters.filter(c => c.completed).length === chapters.length;
+            if (allChaptersDone) {
+                let actionButtonHTML = '';
+                if (subject.revisionStage === 0) actionButtonHTML = `<button class="card-btn w-full mt-4 subject-revision-btn" data-subject-name="${name}">Start Revision Cycle</button>`;
+                else if (subject.revisionStage <= revisionIntervals.length) actionButtonHTML = `<button class="card-btn w-full mt-4 subject-revision-btn" data-subject-name="${name}">Finish Revision ${subject.revisionStage}</button>`;
+                
+                const actionsDiv = document.createElement('div');
+                actionsDiv.innerHTML = actionButtonHTML;
+                const actionButton = actionsDiv.querySelector('.subject-revision-btn');
+                if(actionButton){
+                    actionButton.onclick = (e) => {
+                        const subjectName = e.target.getAttribute('data-subject-name');
+                        appData.subjects[subjectName].revisionStage++;
+                        const nextInterval = revisionIntervals[appData.subjects[subjectName].revisionStage - 1];
+                        if (nextInterval) { const d = new Date(); d.setDate(d.getDate() + nextInterval); appData.subjects[subjectName].dueDate = d.toISOString(); } else { appData.subjects[subjectName].dueDate = null; }
+                        runAllRenders(); saveData();
+                    };
+                    subjectCard.appendChild(actionButton);
+                }
             }
+
             subjectContainer.appendChild(subjectCard);
         });
 
