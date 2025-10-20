@@ -18,6 +18,24 @@ body {
 
 .text-primary { color: var(--primary-color) !important; }
 
+/* Modal Overrides */
+.modal-content {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+}
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+.modal-title {
+    color: var(--primary-color) !important;
+}
+.btn-close {
+    filter: invert(1) grayscale(100) brightness(200%);
+}
+.modal-body ul { list-style-type: none; padding-left: 0; }
+.modal-body li { margin-bottom: 15px; line-height: 1.6; }
+.modal-body li strong { color: var(--primary-color); }
+
 /* Button Overrides */
 .btn-outline-primary {
     --bs-btn-color: var(--primary-color);
@@ -30,63 +48,26 @@ body {
     --bs-btn-active-color: var(--background-color);
     --bs-btn-focus-shadow-rgb: 57, 255, 20;
 }
-.btn-close { --bs-btn-close-color: #fff; }
 
 /* Card Overrides */
-.card {
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-}
-.card-title {
-    color: var(--text-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.75rem;
-}
+.card { background-color: var(--card-background); border: 1px solid var(--border-color); color: var(--text-color); }
+.card-title { color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
 
 /* Form Control Overrides */
-.form-control {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    border-color: var(--border-color);
-}
-.form-control:focus {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25);
-}
+.form-control { background-color: var(--background-color); color: var(--text-color); border-color: var(--border-color); }
+.form-control:focus { background-color: var(--background-color); color: var(--text-color); border-color: var(--primary-color); box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25); }
 .input-group { border-radius: var(--bs-border-radius); }
 .input-group:focus-within { box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25); }
 
 /* List Group Overrides */
-.list-group-item {
-    background-color: transparent;
-    border-color: var(--border-color);
-    color: var(--text-color);
-}
-.list-group-item.text-muted {
-    color: rgba(224, 224, 224, 0.6) !important;
-}
+.list-group-item { background-color: transparent; border-color: var(--border-color); color: var(--text-color); }
+.list-group-item.text-muted { color: rgba(224, 224, 224, 0.6) !important; }
 
 /* Custom Checkbox for Workout */
-.form-check-input {
-    background-color: #555;
-    border-color: #555;
-}
-.form-check-input:checked {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-.form-check-input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25);
-}
-.workout-switch {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+.form-check-input { background-color: #555; border-color: #555; }
+.form-check-input:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
+.form-check-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25); }
+.workout-switch { display: flex; justify-content: space-between; align-items: center; }
 
 /* Stats and Chart Styles */
 .stats-grid { display: grid; grid-template-columns: auto 1fr; gap: 1rem 1.5rem; align-items: center; }
