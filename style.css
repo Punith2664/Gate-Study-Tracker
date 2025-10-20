@@ -16,9 +16,7 @@ body {
     padding-bottom: 1rem;
 }
 
-.text-primary {
-    color: var(--primary-color) !important;
-}
+.text-primary { color: var(--primary-color) !important; }
 
 /* Button Overrides */
 .btn-outline-primary {
@@ -39,7 +37,6 @@ body {
     border: 1px solid var(--border-color);
     color: var(--text-color);
 }
-
 .card-title {
     color: var(--text-color);
     border-bottom: 1px solid var(--border-color);
@@ -52,46 +49,41 @@ body {
     color: var(--text-color);
     border-color: var(--border-color);
 }
-
 .form-control:focus {
     background-color: var(--background-color);
     color: var(--text-color);
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25);
 }
-
-.input-group {
-    border-radius: var(--bs-border-radius);
-}
-
-.input-group:focus-within {
-    box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25);
-}
+.input-group { border-radius: var(--bs-border-radius); }
+.input-group:focus-within { box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25); }
 
 /* List Group Overrides */
 .list-group-item {
     background-color: transparent;
     border-color: var(--border-color);
     color: var(--text-color);
-    /* Fix for invisible text */
 }
+
+/* --- THE FIX IS HERE --- */
+.list-group-item.text-muted {
+    color: rgba(224, 224, 224, 0.6) !important; /* A brighter, slightly faded color */
+}
+
 
 /* Custom Checkbox for Workout */
 .form-check-input {
     background-color: #555;
     border-color: #555;
 }
-
 .form-check-input:checked {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
-
 .form-check-input:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25);
 }
-
 .workout-switch {
     display: flex;
     justify-content: space-between;
@@ -100,43 +92,9 @@ body {
 }
 
 /* Stats and Chart Styles */
-.stats-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 1rem 1.5rem;
-    align-items: center;
-}
-
-.stats-value {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    text-align: right;
-}
-
-.chart-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    height: 150px;
-}
-
-.performance-chart {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: conic-gradient(var(--primary-color) 0deg, var(--chart-track-color) 0deg);
-    transition: background 0.5s ease-in-out;
-}
-
-.chart-label {
-    position: absolute;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.hidden {
-    display: none !important;
-}
+.stats-grid { display: grid; grid-template-columns: auto 1fr; gap: 1rem 1.5rem; align-items: center; }
+.stats-value { font-size: 1.125rem; font-weight: 700; color: var(--primary-color); text-align: right; }
+.chart-container { display: flex; justify-content: center; align-items: center; position: relative; height: 150px; }
+.performance-chart { width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(var(--primary-color) 0deg, var(--chart-track-color) 0deg); transition: background 0.5s ease-in-out; }
+.chart-label { position: absolute; font-size: 2rem; font-weight: 700; color: var(--primary-color); }
+.hidden { display: none !important; }
