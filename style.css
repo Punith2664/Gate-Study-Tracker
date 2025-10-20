@@ -2,7 +2,7 @@
 body { font-family: 'Roboto Mono', monospace; background-color: var(--background-color); color: var(--text-color); padding-top: 1rem; padding-bottom: 1rem; }
 .text-primary { color: var(--primary-color) !important; }
 .btn-outline-primary { --bs-btn-color: var(--primary-color); --bs-btn-border-color: var(--primary-color); --bs-btn-hover-bg: var(--primary-color); --bs-btn-hover-border-color: var(--primary-color); --bs-btn-hover-color: var(--background-color); --bs-btn-active-bg: var(--primary-color); --bs-btn-active-border-color: var(--primary-color); --bs-btn-active-color: var(--background-color); --bs-btn-focus-shadow-rgb: 57, 255, 20; }
-.btn-close { --bs-btn-close-color: #fff; }
+.btn-close { --bs-btn-close-color: #fff; filter: invert(1) grayscale(100) brightness(200%);}
 .card { background-color: var(--card-background); border: 1px solid var(--border-color); color: var(--text-color); }
 .card-title { color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
 .form-control { background-color: var(--background-color); color: var(--text-color); border-color: var(--border-color); }
