@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-    const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -89,7 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTimer(){pauseTimer();const n=Date.now(),t=n+timeLeft*1000;displayTimeLeft(timeLeft);countdown=setInterval(()=>{const s=Math.round((t-Date.now())/1000);if(s<0){clearInterval(countdown);alert("Time for a break!");logStudySession(appData.customMinutes*60);setTimer();return}
     timeLeft=s;displayTimeLeft(s)},1000)}
     function pauseTimer(){clearInterval(countdown)}
-    customMinutesInput.addEventListener('change',setTimer);startBtn.addEventListener('click',startTimer);pauseBtn.addEventListener('click',pauseTimer);resetBtn.addEventListener('click',resetBtn);const taskInput=document.getElementById('new-task-input'),addTaskBtn=document.getElementById('add-task-btn'),todoList=document.getElementById('todo-list');function renderTodos(){todoList.innerHTML='';(appData.todos||[]).forEach((t,i)=>{const n=document.createElement("li");t.completed&&n.classList.add("completed");const e=document.createElement("input");e.type="checkbox",e.checked=t.completed,e.id=`todo-${i}`,e.onchange=()=>{appData.todos[i].completed=e.checked,n.classList.toggle("completed",e.checked),saveData()};const o=document.createElement("label");o.htmlFor=`todo-${i}`,o.textContent=t.text;const s=document.createElement("button");s.textContent="Delete",s.onclick=()=>{appData.todos.splice(i,1),renderTodos(),saveData()},n.appendChild(e),n.appendChild(o),n.appendChild(s),todoList.appendChild(n)})}
+    customMinutesInput.addEventListener('change',setTimer);startBtn.addEventListener('click',startTimer);pauseBtn.addEventListener('click',pauseTimer);
+    
+    // THE FIX IS HERE: The event listener for the reset button is now correct.
+    resetBtn.addEventListener('click',setTimer);
+    
+    const taskInput=document.getElementById('new-task-input'),addTaskBtn=document.getElementById('add-task-btn'),todoList=document.getElementById('todo-list');function renderTodos(){todoList.innerHTML='';(appData.todos||[]).forEach((t,i)=>{const n=document.createElement("li");t.completed&&n.classList.add("completed");const e=document.createElement("input");e.type="checkbox",e.checked=t.completed,e.id=`todo-${i}`,e.onchange=()=>{appData.todos[i].completed=e.checked,n.classList.toggle("completed",e.checked),saveData()};const o=document.createElement("label");o.htmlFor=`todo-${i}`,o.textContent=t.text;const s=document.createElement("button");s.textContent="Delete",s.onclick=()=>{appData.todos.splice(i,1),renderTodos(),saveData()},n.appendChild(e),n.appendChild(o),n.appendChild(s),todoList.appendChild(n)})}
     function addTask(){const t=taskInput.value.trim();if(t==='')return;(appData.todos=appData.todos||[]).push({text:t,completed:false});taskInput.value='';renderTodos();saveData()}
     addTaskBtn.addEventListener('click',addTask);taskInput.addEventListener('keypress',(e)=>{if(e.key==='Enter')addTask()});const workoutCheckbox=document.getElementById('workout-checkbox');function updateWorkoutDisplay(){const todayStr=new Date().toISOString().slice(0,10);workoutCheckbox.checked=(appData.workouts||[]).includes(todayStr)}
     workoutCheckbox.addEventListener('change',()=>{const todayStr=new Date().toISOString().slice(0,10);if(workoutCheckbox.checked){if(!(appData.workouts||[]).includes(todayStr))(appData.workouts=appData.workouts||[]).push(todayStr)}else{appData.workouts=(appData.workouts||[]).filter(date=>date!==todayStr)}
