@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   appId: "1:259844602783:web:1ee661008b810445f19baa",
   measurementId: "G-WGSPK78XB2"
 };
-
     // --- Initialize Firebase ---
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -101,13 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
         todoList.innerHTML = '';
         (appData.todos || []).forEach((task, index) => {
             const li = document.createElement('li');
-            li.className = `py-3 border-b border-border-color flex items-center gap-4`;
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
             li.innerHTML = `
-                <input type="checkbox" id="todo-${index}" class="chapter-checkbox" ${task.completed ? 'checked' : ''}>
-                <label for="todo-${index}" class="flex-grow ${task.completed ? 'line-through text-gray-500' : ''}">${task.text}</label>
-                <button class="delete-todo-btn bg-transparent border border-danger text-danger text-xs px-2 py-0.5 rounded-md hover:bg-danger hover:text-dark transition-colors">&times;</button>`;
-            li.querySelector('.chapter-checkbox').onchange = () => { appData.todos[index].completed = !appData.todos[index].completed; renderTodos(); saveData(); };
-            li.querySelector('.delete-todo-btn').onclick = () => { appData.todos.splice(index, 1); renderTodos(); saveData(); };
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="todo-${index}" ${task.completed ? 'checked' : ''}>
+                    <label class="form-check-label ${task.completed ? 'text-decoration-line-through text-muted' : ''}" for="todo-${index}">${task.text}</label>
+                </div>
+                <button class="btn-close ms-2"></button>`;
+            li.querySelector('.form-check-input').onchange = () => { appData.todos[index].completed = !appData.todos[index].completed; renderTodos(); saveData(); };
+            li.querySelector('.btn-close').onclick = () => { appData.todos.splice(index, 1); renderTodos(); saveData(); };
             todoList.appendChild(li);
         });
     }
@@ -122,20 +123,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Activity Log
     function updateLoginStats() {
         const history = [...new Set((appData.loginHistory || []))].map(d => new Date(d)).sort((a,b) => a-b);
-        if (history.length === 0) { ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days"); return; }
-        let longestStreak = 0, currentStreak = 0, tempStreak = 0;
-        for (let i = 0; i < history.length; i++) {
-            tempStreak = (i > 0 && (history[i] - history[i - 1]) / (1000 * 3600 * 24) === 1) ? tempStreak + 1 : 1;
+        const uniqueDays = history.length;
+        if (uniqueDays === 0) { ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days"); return; }
+        let longestStreak = 0, currentStreak = 0, tempStreak = 1;
+        if (uniqueDays > 0) longestStreak = 1;
+        for (let i = 1; i < uniqueDays; i++) {
+            const diff = (history[i] - history[i - 1]) / (1000 * 3600 * 24);
+            if (diff === 1) tempStreak++;
+            else if (diff > 1) tempStreak = 1;
             if (tempStreak > longestStreak) longestStreak = tempStreak;
         }
         const today = new Date(new Date().toISOString().slice(0,10));
-        const lastLogin = history[history.length-1];
-        if ((today - lastLogin)/(1000 * 3600 * 24) < 2) {
-            currentStreak = tempStreak;
-        }
+        const lastLogin = history[uniqueDays-1];
+        if ((today - lastLogin)/(1000 * 3600 * 24) < 2) currentStreak = tempStreak;
         document.getElementById('stats-current-streak').textContent = `${currentStreak} day${currentStreak !== 1 ? 's' : ''}`;
         document.getElementById('stats-longest-streak').textContent = `${longestStreak} day${longestStreak !== 1 ? 's' : ''}`;
-        document.getElementById('stats-total-days').textContent = `${history.length} day${history.length !== 1 ? 's' : ''}`;
+        document.getElementById('stats-total-days').textContent = `${uniqueDays} day${uniqueDays !== 1 ? 's' : ''}`;
     }
 
     // Study Statistics
@@ -145,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Subject & Revision Logic
     const subjectContainer = document.getElementById('subject-container'), revisionList = document.getElementById('revision-list'), performanceChart = document.querySelector('.performance-chart'), chartPercentageLabel = document.getElementById('chart-percentage');
-    function renderRevisionsDue() { revisionList.innerHTML = ''; const e = new Date; e.setHours(23, 59, 59, 999); let t = 0; Object.keys(appData.subjects || {}).forEach(a => { const s = appData.subjects[a]; if (s.dueDate && new Date(s.dueDate) <= e) { const e = document.createElement("li"); e.className = "py-2 border-b border-border-color flex justify-between", e.innerHTML = `<span>${a}</span> <span class="text-gray-400 text-sm">(Revision ${s.revisionStage})</span>`, revisionList.appendChild(e), t++ } }), 0 === t && (revisionList.innerHTML = '<li class="py-2 text-gray-400">No revisions due today. Well done!</li>') }
+    function renderRevisionsDue() { revisionList.innerHTML = ''; const e = new Date; e.setHours(23, 59, 59, 999); let t = 0; Object.keys(appData.subjects || {}).forEach(a => { const s = appData.subjects[a]; if (s.dueDate && new Date(s.dueDate) <= e) { const e = document.createElement("li"); e.className = "list-group-item d-flex justify-content-between", e.innerHTML = `<span>${a}</span> <span class="text-muted small">(Revision ${s.revisionStage})</span>`, revisionList.appendChild(e), t++ } }), 0 === t && (revisionList.innerHTML = '<li class="list-group-item text-muted">No revisions due today. Well done!</li>') }
     
     function renderSubjectsAndProgress() {
         subjectContainer.innerHTML = '';
@@ -153,42 +156,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         subjectNames.forEach(name => {
             const subject = appData.subjects[name];
-            const subjectCard = document.createElement('div');
-            subjectCard.className = 'bg-dark border border-border-color rounded-lg p-4 flex flex-col';
+            const subjectCol = document.createElement('div');
+            subjectCol.className = 'col-lg-4 col-md-6';
             
             const chapters = subject.chapters || [];
             completedChapters += chapters.filter(c => c.completed).length;
             totalChapters += chapters.length;
 
-            let revisionHTML = (subject.revisionStage > 0) ? `<span class="text-xs font-bold border border-primary text-primary px-2 py-1 rounded-full">${subject.revisionStage > revisionIntervals.length ? 'Done' : `R${subject.revisionStage}`}</span>` : '';
+            let revisionHTML = (subject.revisionStage > 0) ? `<span class="badge rounded-pill bg-primary">${subject.revisionStage > revisionIntervals.length ? 'Done' : `R${subject.revisionStage}`}</span>` : '';
             
-            subjectCard.innerHTML = `<div class="flex justify-between items-center mb-4"><h4 class="text-lg font-bold">${name}</h4>${revisionHTML}</div><ul class="chapter-list flex-grow list-none p-0 max-h-40 overflow-y-auto"></ul><div class="flex mt-4"><input type="text" placeholder="Add new chapter..." class="flex-grow bg-dark border border-border-color p-2 rounded-l-md focus:outline-none focus:border-primary text-sm"><button class="card-btn text-sm rounded-l-none">Add</button></div>`;
-
-            const chapterList = subjectCard.querySelector('.chapter-list');
+            subjectCol.innerHTML = `
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="h5 card-title mb-0">${name}</h4>
+                            ${revisionHTML}
+                        </div>
+                        <ul class="list-group list-group-flush flex-grow-1 chapter-list"></ul>
+                        <div class="input-group mt-3">
+                            <input type="text" class="form-control form-control-sm" placeholder="Add new chapter...">
+                            <button class="btn btn-sm btn-outline-primary">Add</button>
+                        </div>
+                    </div>
+                </div>`;
+            
+            const chapterList = subjectCol.querySelector('.chapter-list');
             chapters.forEach((chapter, index) => {
                 const li = document.createElement('li');
-                li.className = 'flex items-center justify-between py-2 text-sm';
+                li.className = 'list-group-item d-flex justify-content-between align-items-center px-0';
                 li.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" id="${name.replace(/\s+/g, '-')}-${index}" class="chapter-checkbox" ${chapter.completed ? 'checked' : ''}>
-                        <label for="${name.replace(/\s+/g, '-')}-${index}" class="${chapter.completed ? 'line-through text-gray-500' : ''}">${chapter.text}</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="${name.replace(/\s+/g, '-')}-${index}" ${chapter.completed ? 'checked' : ''}>
+                        <label class="form-check-label ${chapter.completed ? 'text-decoration-line-through text-muted' : ''}" for="${name.replace(/\s+/g, '-')}-${index}">${chapter.text}</label>
                     </div>
-                    <button class="delete-chapter-btn bg-transparent text-danger text-xl font-bold hover:text-red-400 transition-colors p-0 leading-none">&times;</button>`;
-                li.querySelector('.chapter-checkbox').onchange = () => { appData.subjects[name].chapters[index].completed = !appData.subjects[name].chapters[index].completed; runAllRenders(); saveData(); };
+                    <button class="btn-close btn-sm delete-chapter-btn"></button>`;
+                li.querySelector('.form-check-input').onchange = () => { appData.subjects[name].chapters[index].completed = !appData.subjects[name].chapters[index].completed; runAllRenders(); saveData(); };
                 li.querySelector('.delete-chapter-btn').onclick = () => { appData.subjects[name].chapters.splice(index, 1); runAllRenders(); saveData(); };
                 chapterList.appendChild(li);
             });
 
-            subjectCard.querySelector('.chapter-input button').onclick = () => {
-                const input = subjectCard.querySelector('.chapter-input input');
+            subjectCol.querySelector('.input-group button').onclick = () => {
+                const input = subjectCol.querySelector('.input-group input');
                 if (input.value.trim()) { (appData.subjects[name].chapters = appData.subjects[name].chapters || []).push({ text: input.value.trim(), completed: false }); input.value = ''; runAllRenders(); saveData(); }
             };
 
             const allChaptersDone = chapters.length > 0 && chapters.every(c => c.completed);
             if (allChaptersDone) {
                 let btnHTML = '';
-                if (subject.revisionStage === 0) btnHTML = `<button class="card-btn w-full mt-4 subject-revision-btn" data-subject-name="${name}">Start Revision Cycle</button>`;
-                else if (subject.revisionStage <= revisionIntervals.length) btnHTML = `<button class="card-btn w-full mt-4 subject-revision-btn" data-subject-name="${name}">Finish Revision ${subject.revisionStage}</button>`;
+                if (subject.revisionStage === 0) btnHTML = `<button class="btn btn-primary w-100 mt-3 subject-revision-btn" data-subject-name="${name}">Start Revision Cycle</button>`;
+                else if (subject.revisionStage <= revisionIntervals.length) btnHTML = `<button class="btn btn-primary w-100 mt-3 subject-revision-btn" data-subject-name="${name}">Finish Revision ${subject.revisionStage}</button>`;
                 if(btnHTML) {
                     const actionsDiv = document.createElement('div');
                     actionsDiv.innerHTML = btnHTML;
@@ -199,10 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (nextInterval) { const d = new Date(); d.setDate(d.getDate() + nextInterval); appData.subjects[subjectName].dueDate = d.toISOString(); } else { appData.subjects[subjectName].dueDate = null; }
                         runAllRenders(); saveData();
                     };
-                    subjectCard.appendChild(actionsDiv);
+                    subjectCol.querySelector('.card-body').appendChild(actionsDiv);
                 }
             }
-            subjectContainer.appendChild(subjectCard);
+            subjectContainer.appendChild(subjectCol);
         });
 
         const overallPercentage = totalChapters === 0 ? 0 : Math.round((completedChapters / totalChapters) * 100);
