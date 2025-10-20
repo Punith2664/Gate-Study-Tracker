@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATE EC Study Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <h1>GATE EC Dashboard</h1>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h2>Study Timer</h2>
+            <div class="timer-display">25:00</div>
+            <div class="custom-timer-input">
+                <label for="custom-minutes">Set Minutes:</label>
+                <input type="number" id="custom-minutes" value="25" min="1">
+            </div>
+            <div class="timer-controls">
+                <button id="start-timer">Start</button>
+                <button id="pause-timer">Pause</button>
+                <button id="reset-timer">Reset</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Revisions Due Today</h2>
+            <ul id="revision-list">
+                </ul>
+        </div>
+
+        <div class="card">
+            <h2>Today's To-Do List</h2>
+            <ul id="todo-list">
+                </ul>
+            <div class="todo-input">
+                <input type="text" id="new-task-input" placeholder="e.g., Solve 10 PYQs">
+                <button id="add-task-btn">Add Task</button>
+            </div>
+        </div>
+
+        <div class="card full-width-card">
+            <h2>Subject Completion Tracker</h2>
+            <div class="overall-progress-container">
+                <p>Overall Progress: <span id="progress-text">0%</span></p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            <div id="subject-container" class="subject-grid">
+                </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
