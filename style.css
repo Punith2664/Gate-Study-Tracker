@@ -30,6 +30,7 @@ body {
     --bs-btn-active-color: var(--background-color);
     --bs-btn-focus-shadow-rgb: 57, 255, 20;
 }
+.btn-close { --bs-btn-close-color: #fff; }
 
 /* Card Overrides */
 .card {
@@ -64,12 +65,9 @@ body {
     border-color: var(--border-color);
     color: var(--text-color);
 }
-
-/* --- THE FIX IS HERE --- */
 .list-group-item.text-muted {
-    color: rgba(224, 224, 224, 0.6) !important; /* A brighter, slightly faded color */
+    color: rgba(224, 224, 224, 0.6) !important;
 }
-
 
 /* Custom Checkbox for Workout */
 .form-check-input {
@@ -88,7 +86,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 2rem;
 }
 
 /* Stats and Chart Styles */
