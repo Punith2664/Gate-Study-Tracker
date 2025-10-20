@@ -1,14 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-   const firebaseConfig = {
-  apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
-  authDomain: "gate-study-tracker-9a588.firebaseapp.com",
-  projectId: "gate-study-tracker-9a588",
-  storageBucket: "gate-study-tracker-9a588.firebasestorage.app",
-  messagingSenderId: "259844602783",
-  appId: "1:259844602783:web:1ee661008b810445f19baa",
-  measurementId: "G-WGSPK78XB2"
-};
 
     // --- Initialize Firebase ---
     firebase.initializeApp(firebaseConfig);
