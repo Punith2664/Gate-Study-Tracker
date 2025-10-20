@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
- const firebaseConfig = {
+   const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -51,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userId || !appData) return;
         try {
             await db.collection('users').doc(userId).set(appData);
-        } catch (error) {
-            console.error("Error saving data: ", error);
-        }
+        } catch (error) { console.error("Error saving data: ", error); }
     }
 
     async function loadDataFromFirebase() {
@@ -62,14 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const doc = await docRef.get();
         appData = doc.exists ? doc.data() : { todos: [], subjects: {}, customMinutes: 25, studySessions: [], workouts: [], loginHistory: [] };
 
-        // Daily Popup Logic
         const todayStr = new Date().toISOString().slice(0, 10);
         if (localStorage.getItem('lastVisited') !== todayStr) {
             modalOverlay.style.display = 'flex';
             localStorage.setItem('lastVisited', todayStr);
         }
 
-        // Initialize default data structures if they don't exist
         if (!(appData.loginHistory || []).includes(todayStr)) {
             (appData.loginHistory = appData.loginHistory || []).push(todayStr);
         }
@@ -80,12 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Initial UI Render
         customMinutesInput.value = appData.customMinutes || 25;
         setTimer();
         renderTodos();
         runAllRenders();
-        saveData(); // Save any initializations (like login history)
+        saveData();
     }
 
     // --- UI & RENDER FUNCTIONS ---
@@ -100,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Popup
     closeModalBtn.addEventListener('click', () => modalOverlay.style.display = 'none');
     modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; });
-
+    
     // Timer
     const timerDisplay = document.getElementById('timer-display'), startBtn = document.getElementById('start-timer'), pauseBtn = document.getElementById('pause-timer'), resetBtn = document.getElementById('reset-timer'), customMinutesInput = document.getElementById('custom-minutes');
     let countdown, timeLeft;
@@ -137,12 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Activity Log
     function updateLoginStats() {
-        const history = [...new Set((appData.loginHistory || []))].map(d => new Date(d)).sort((a, b) => a - b);
-        if (history.length === 0) {
-            ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days");
-            return;
-        }
-
+        const history = [...new Set((appData.loginHistory || []))].map(d => new Date(d)).sort((a,b) => a-b);
+        if (history.length === 0) { ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days"); return; }
+        
         let longestStreak = 0, currentStreak = 0;
         let tempStreak = 1;
         if (history.length > 0) longestStreak = 1;
@@ -151,27 +143,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const diff = (history[i] - history[i - 1]) / (1000 * 3600 * 24);
             if (diff === 1) {
                 tempStreak++;
-            } else {
+            } else if (diff > 1) {
                 tempStreak = 1;
             }
             if (tempStreak > longestStreak) longestStreak = tempStreak;
         }
 
-        const today = new Date(new Date().toISOString().slice(0, 10));
-        const lastLogin = history[history.length - 1];
-        const diffToday = (today - lastLogin) / (1000 * 3600 * 24);
-
-        if (diffToday === 0) {
+        const today = new Date(new Date().toISOString().slice(0,10));
+        const lastLogin = history[history.length-1];
+        if ((today - lastLogin)/(1000 * 3600 * 24) < 2) {
             currentStreak = tempStreak;
-        } else if (diffToday === 1) {
-             currentStreak = tempStreak;
-        } else {
-            currentStreak = 0;
         }
-        
-        // Final check for current streak if only one day is logged
-        if(history.length === 1 && diffToday === 0) currentStreak = 1;
-
 
         document.getElementById('stats-current-streak').textContent = `${currentStreak} day${currentStreak !== 1 ? 's' : ''}`;
         document.getElementById('stats-longest-streak').textContent = `${longestStreak} day${longestStreak !== 1 ? 's' : ''}`;
@@ -195,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const subject = appData.subjects[name];
             const subjectCard = document.createElement('div');
             subjectCard.className = 'bg-card border border-border-color rounded-lg p-4 flex flex-col';
-
+            
             const chapters = subject.chapters || [];
             completedChapters += chapters.filter(c => c.completed).length;
             totalChapters += chapters.length;
