@@ -1,81 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap');
-
-:root {
-    --primary-color: #39ff14;
-    --background-color: #1e1e1e;
-    --card-background: #2a2a2a;
-    --text-color: #e0e0e0;
-    --border-color: rgba(57, 255, 20, 0.3);
-    --danger-color: #ff3131;
-    --chart-track-color: #444;
+/* Custom base styles and components that complement Tailwind */
+.card {
+    @apply bg-card border border-border-color rounded-lg p-6 shadow-[0_0_15px_rgba(57,255,20,0.05)];
 }
 
-body {
-    font-family: 'Roboto Mono', monospace;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    margin: 0; padding: 20px;
+.card-title {
+    @apply text-xl font-bold border-b border-border-color pb-4 mb-4;
 }
 
-#login-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; }
-#login-container h1 { color: var(--primary-color); text-shadow: 0 0 5px var(--primary-color); margin-bottom: 30px; }
-.hidden { display: none !important; }
+.card-btn {
+    @apply bg-transparent border border-primary text-primary px-4 py-2 rounded-md hover:bg-primary hover:text-dark hover:shadow-[0_0_15px_var(--tw-shadow-color)] shadow-primary transition-all;
+}
 
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-header h1 { color: var(--primary-color); font-weight: 500; text-shadow: 0 0 5px var(--primary-color); margin: 0; }
-#logout-btn { font-size: 0.9rem; padding: 8px 16px; }
+.stats-grid {
+    @apply grid grid-cols-[auto,1fr] gap-x-6 gap-y-4 items-center;
+}
 
-.container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-.card { background-color: var(--card-background); border-radius: 8px; padding: 25px; border: 1px solid var(--border-color); box-shadow: 0 0 15px rgba(57, 255, 20, 0.05); }
-.card h2 { margin-top: 0; font-weight: 500; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
+.stats-value {
+    @apply text-lg font-bold text-primary text-right;
+}
 
-.timer-display { font-size: 4rem; font-weight: 500; text-align: center; margin: 10px 0; color: var(--primary-color); }
-.custom-timer-input { text-align: center; margin-bottom: 20px; }
-#custom-minutes { width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; font-size: 1rem; background: var(--background-color); color: var(--text-color); }
-.stats-grid { display: grid; grid-template-columns: auto 1fr; gap: 15px 20px; align-items: center; }
-.stats-label { font-weight: 500; color: var(--text-color); opacity: 0.8; }
-.stats-value { font-size: 1.2rem; font-weight: 500; color: var(--primary-color); text-align: right; }
+/* Custom checkbox for chapters */
+.chapter-checkbox + label {
+    cursor: pointer;
+    position: relative;
+    padding-left: 28px;
+}
 
-.chart-container { display: flex; justify-content: center; align-items: center; position: relative; height: 150px; }
-.performance-chart { width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(var(--primary-color) 0deg, var(--chart-track-color) 0deg); transition: background 0.5s ease-in-out; }
-.chart-label { position: absolute; font-size: 2rem; font-weight: 500; color: var(--primary-color); }
+.chapter-checkbox + label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--tw-colors-border-color);
+    border-radius: 3px;
+    background-color: var(--tw-colors-dark);
+}
 
-button { background-color: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 12px 22px; border-radius: 4px; cursor: pointer; font-size: 1rem; font-family: 'Roboto Mono', monospace; font-weight: 500; transition: all 0.3s ease; }
-button:hover { background-color: var(--primary-color); color: var(--background-color); box-shadow: 0 0 15px var(--primary-color); }
+.chapter-checkbox:checked + label::before {
+    background-color: var(--tw-colors-primary);
+    border-color: var(--tw-colors-primary);
+}
 
-#todo-list, #revision-list { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; }
-#revision-list li { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-#todo-list li { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
-#todo-list li input[type="checkbox"] { display: none; }
-#todo-list li label { cursor: pointer; position: relative; padding-left: 25px; flex-grow: 1; }
-#todo-list li label::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; border: 1px solid var(--border-color); border-radius: 2px; background-color: var(--background-color); }
-#todo-list li label::after { content: ''; position: absolute; display: none; left: 6px; top: 50%; width: 4px; height: 8px; border: solid var(--background-color); border-width: 0 2px 2px 0; transform: translateY(-60%) rotate(45deg); }
-#todo-list li input:checked + label::before { background-color: var(--primary-color); border-color: var(--primary-color); }
-#todo-list li input:checked + label::after { display: block; }
-#todo-list li.completed label { text-decoration: line-through; color: #888; }
-#todo-list li button { background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); padding: 5px 10px; font-size: 0.8rem; }
-.todo-input { display: flex; margin-top: 15px; }
-#new-task-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 10px; border-radius: 4px 0 0 4px; background: var(--background-color); color: var(--text-color); }
+.chapter-checkbox:checked + label::after {
+    content: '';
+    position: absolute;
+    display: block;
+    left: 7px;
+    top: 50%;
+    width: 5px;
+    height: 10px;
+    border: solid var(--tw-colors-dark);
+    border-width: 0 2px 2px 0;
+    transform: translateY(-60%) rotate(45deg);
+}
 
-.workout-tracker { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; }
-#workout-checkbox { appearance: none; -webkit-appearance: none; width: 50px; height: 26px; background-color: #555; border-radius: 13px; position: relative; cursor: pointer; transition: background-color 0.3s; }
-#workout-checkbox::before { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background-color: var(--text-color); top: 3px; left: 4px; transition: transform 0.3s; }
-#workout-checkbox:checked { background-color: var(--primary-color); }
-#workout-checkbox:checked::before { transform: translateX(24px); }
+/* Custom toggle for workout */
+.workout-toggle {
+    appearance: none;
+    width: 50px;
+    height: 26px;
+    background-color: #555;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
-.full-width-card { grid-column: 1 / -1; }
-.subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.subject-card { background-color: #252525; }
-.chapter-list { list-style: none; padding: 0; max-height: 150px; overflow-y: auto; }
-.chapter-list li { display: flex; align-items: center; justify-content: space-between; padding: 8px 5px; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); }
-.chapter-list li .chapter-content { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
-.chapter-list li input[type="checkbox"] { display: none; }
-.chapter-list li label { cursor: pointer; position: relative; padding-left: 25px; }
-.chapter-input { display: flex; margin-top: 10px; }
-.subject-actions { margin-top: 15px; text-align: center; }
-.revision-tag { font-size: 0.75rem; font-weight: 500; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--primary-color); color: var(--primary-color); }
-.tag-done { background-color: var(--primary-color); color: var(--background-color); }
-.chapter-delete-btn { background: transparent; border: none; cursor: pointer; width: 22px; height: 22px; padding: 0; position: relative; opacity: 0.6; transition: opacity 0.2s; flex-shrink: 0; }
-.chapter-delete-btn:hover { opacity: 1; }
-.chapter-delete-btn::before { content: ''; position: absolute; bottom: 0; left: 4px; width: 10px; height: 12px; border: 1px solid var(--danger-color); border-top: none; border-radius: 0 0 2px 2px; }
-.chapter-delete-btn::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 2px; background-color: var(--danger-color); }
+.workout-toggle::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    top: 3px;
+    left: 4px;
+    transition: transform 0.3s;
+}
+
+.workout-toggle:checked {
+    background-color: var(--tw-colors-primary);
+}
+
+.workout-toggle:checked::before {
+    transform: translateX(24px);
+}
+
+/* Donut chart background */
+.performance-chart {
+    background: conic-gradient(var(--tw-colors-primary) 0deg, var(--tw-colors-chart-track) 0deg);
+}
