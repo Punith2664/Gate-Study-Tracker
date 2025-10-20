@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-    const firebaseConfig = {
+   const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   appId: "1:259844602783:web:1ee661008b810445f19baa",
   measurementId: "G-WGSPK78XB2"
 };
+
     // --- Initialize Firebase ---
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -123,22 +124,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Activity Log
     function updateLoginStats() {
         const history = [...new Set((appData.loginHistory || []))].map(d => new Date(d)).sort((a,b) => a-b);
-        const uniqueDays = history.length;
-        if (uniqueDays === 0) { ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days"); return; }
+        if (history.length === 0) { ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days"); return; }
+        
         let longestStreak = 0, currentStreak = 0, tempStreak = 1;
-        if (uniqueDays > 0) longestStreak = 1;
-        for (let i = 1; i < uniqueDays; i++) {
+        if (history.length > 0) longestStreak = 1;
+
+        for (let i = 1; i < history.length; i++) {
             const diff = (history[i] - history[i - 1]) / (1000 * 3600 * 24);
-            if (diff === 1) tempStreak++;
-            else if (diff > 1) tempStreak = 1;
+            if (diff === 1) {
+                tempStreak++;
+            } else if (diff > 1) {
+                tempStreak = 1;
+            }
             if (tempStreak > longestStreak) longestStreak = tempStreak;
         }
+
         const today = new Date(new Date().toISOString().slice(0,10));
-        const lastLogin = history[uniqueDays-1];
-        if ((today - lastLogin)/(1000 * 3600 * 24) < 2) currentStreak = tempStreak;
+        const lastLogin = history[history.length-1];
+        if ((today - lastLogin)/(1000 * 3600 * 24) < 2) {
+            currentStreak = tempStreak;
+        }
+
         document.getElementById('stats-current-streak').textContent = `${currentStreak} day${currentStreak !== 1 ? 's' : ''}`;
         document.getElementById('stats-longest-streak').textContent = `${longestStreak} day${longestStreak !== 1 ? 's' : ''}`;
-        document.getElementById('stats-total-days').textContent = `${uniqueDays} day${uniqueDays !== 1 ? 's' : ''}`;
+        document.getElementById('stats-total-days').textContent = `${history.length} day${history.length !== 1 ? 's' : ''}`;
     }
 
     // Study Statistics
@@ -172,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h4 class="h5 card-title mb-0">${name}</h4>
                             ${revisionHTML}
                         </div>
-                        <ul class="list-group list-group-flush flex-grow-1 chapter-list"></ul>
+                        <ul class="list-group list-group-flush flex-grow-1 chapter-list" style="max-height: 200px; overflow-y: auto;"></ul>
                         <div class="input-group mt-3">
                             <input type="text" class="form-control form-control-sm" placeholder="Add new chapter...">
                             <button class="btn btn-sm btn-outline-primary">Add</button>
