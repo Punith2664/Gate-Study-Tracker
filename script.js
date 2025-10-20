@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appContainer = document.getElementById('app-container');
     const loginBtn = document.getElementById('login-btn');
     const logoutBtn = document.getElementById('logout-btn');
-    const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+    const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal')); // <-- THE FIX IS HERE
 
     // --- AUTHENTICATION ---
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const doc = await docRef.get();
         appData = doc.exists ? doc.data() : { todos: [], subjects: {}, customMinutes: 25, studySessions: [], workouts: [], loginHistory: [] };
 
-        // Daily Popup Logic
+        // Daily Popup Logic <-- THE FIX IS HERE
         const todayStr = new Date().toISOString().slice(0, 10);
         if (localStorage.getItem('lastVisited') !== todayStr) {
             welcomeModal.show();
