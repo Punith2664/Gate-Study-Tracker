@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-   const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -26,10 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const appContainer = document.getElementById('app-container');
     const loginBtn = document.getElementById('login-btn');
     const logoutBtn = document.getElementById('logout-btn');
-    const modalOverlay = document.getElementById('welcome-modal-overlay');
-    const closeModalBtn = document.getElementById('close-modal');
 
-    // --- AUTHENTICATION & DATA HANDLING ---
+    // --- AUTHENTICATION ---
     const provider = new firebase.auth.GoogleAuthProvider();
     loginBtn.addEventListener('click', () => auth.signInWithPopup(provider));
     logoutBtn.addEventListener('click', () => auth.signOut());
@@ -47,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- DATA HANDLING ---
     async function saveData() {
         if (!userId || !appData) return;
         try {
@@ -61,11 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
         appData = doc.exists ? doc.data() : { todos: [], subjects: {}, customMinutes: 25, studySessions: [], workouts: [], loginHistory: [] };
 
         const todayStr = new Date().toISOString().slice(0, 10);
-        if (localStorage.getItem('lastVisited') !== todayStr) {
-            modalOverlay.style.display = 'flex';
-            localStorage.setItem('lastVisited', todayStr);
-        }
-
         if (!(appData.loginHistory || []).includes(todayStr)) {
             (appData.loginHistory = appData.loginHistory || []).push(todayStr);
         }
@@ -91,10 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateWorkoutDisplay();
         updateLoginStats();
     }
-
-    // Modal Popup
-    closeModalBtn.addEventListener('click', () => modalOverlay.style.display = 'none');
-    modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; });
     
     // Timer
     const timerDisplay = document.getElementById('timer-display'), startBtn = document.getElementById('start-timer'), pauseBtn = document.getElementById('pause-timer'), resetBtn = document.getElementById('reset-timer'), customMinutesInput = document.getElementById('custom-minutes');
@@ -115,8 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             li.innerHTML = `
                 <input type="checkbox" id="todo-${index}" class="chapter-checkbox" ${task.completed ? 'checked' : ''}>
                 <label for="todo-${index}" class="flex-grow ${task.completed ? 'line-through text-gray-500' : ''}">${task.text}</label>
-                <button class="delete-todo-btn bg-transparent border border-danger text-danger text-xs px-2 py-0.5 rounded-md hover:bg-danger hover:text-dark transition-colors">&times;</button>
-            `;
+                <button class="delete-todo-btn bg-transparent border border-danger text-danger text-xs px-2 py-0.5 rounded-md hover:bg-danger hover:text-dark transition-colors">&times;</button>`;
             li.querySelector('.chapter-checkbox').onchange = () => { appData.todos[index].completed = !appData.todos[index].completed; renderTodos(); saveData(); };
             li.querySelector('.delete-todo-btn').onclick = () => { appData.todos.splice(index, 1); renderTodos(); saveData(); };
             todoList.appendChild(li);
@@ -133,13 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Activity Log
     function updateLoginStats() {
         const history = [...new Set((appData.loginHistory || []))].map(d => new Date(d)).sort((a,b) => a-b);
-        if (history.length === 0) { ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days"); return; }
-        
+        const uniqueDays = history.length;
+
+        if (uniqueDays === 0) {
+            ["stats-current-streak", "stats-longest-streak", "stats-total-days"].forEach(id => document.getElementById(id).textContent = "0 days");
+            return;
+        }
+
         let longestStreak = 0, currentStreak = 0;
         let tempStreak = 1;
-        if (history.length > 0) longestStreak = 1;
+        if (uniqueDays > 0) longestStreak = 1;
 
-        for (let i = 1; i < history.length; i++) {
+        for (let i = 1; i < uniqueDays; i++) {
             const diff = (history[i] - history[i - 1]) / (1000 * 3600 * 24);
             if (diff === 1) {
                 tempStreak++;
@@ -150,14 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const today = new Date(new Date().toISOString().slice(0,10));
-        const lastLogin = history[history.length-1];
+        const lastLogin = history[uniqueDays-1];
         if ((today - lastLogin)/(1000 * 3600 * 24) < 2) {
             currentStreak = tempStreak;
         }
 
         document.getElementById('stats-current-streak').textContent = `${currentStreak} day${currentStreak !== 1 ? 's' : ''}`;
         document.getElementById('stats-longest-streak').textContent = `${longestStreak} day${longestStreak !== 1 ? 's' : ''}`;
-        document.getElementById('stats-total-days').textContent = `${history.length} day${history.length !== 1 ? 's' : ''}`;
+        document.getElementById('stats-total-days').textContent = `${uniqueDays} day${uniqueDays !== 1 ? 's' : ''}`;
     }
 
     // Study Statistics
