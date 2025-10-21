@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DATA HANDLING ---
     async function saveData() {
         if (!userId || !appData) return;
-        try { await db.collection('users').doc(userId).set(appData); }
+        try { await db.collection('users').doc(userId).set(appData); } 
         catch (error) { console.error("Error saving data: ", error); }
     }
 
@@ -92,34 +92,34 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStats();
         updateWorkoutStats();
     }
-
+    
     // --- THE FIX IS IN THE TIMER SECTION ---
     const timerDisplay = document.getElementById('timer-display'), startBtn = document.getElementById('start-timer'), pauseBtn = document.getElementById('pause-timer'), resetBtn = document.getElementById('reset-timer'), customMinutesInput = document.getElementById('custom-minutes');
     let countdown, timeLeft;
     function displayTimeLeft(s) { const m = Math.floor(s / 60), r = s % 60; timerDisplay.textContent = `${m}:${r < 10 ? '0' : ''}${r}`; document.title = `${m}:${r < 10 ? '0' : ''}${r}` }
     function setTimer() { pauseTimer(); appData.customMinutes = parseInt(customMinutesInput.value) || 25; timeLeft = appData.customMinutes * 60; displayTimeLeft(timeLeft); saveData(); }
     
-    function startTimer() {
+    function startTimer() { 
         // Prime the audio on user click to get permission from the browser
         alertSound.play().then(() => alertSound.pause()).catch(() => {});
         alertSound.currentTime = 0;
 
-        pauseTimer();
-        const n = Date.now(), t = n + timeLeft * 1000;
-        displayTimeLeft(timeLeft);
-        countdown = setInterval(() => {
-            const s = Math.round((t - Date.now()) / 1000);
-            if (s < 0) {
+        pauseTimer(); 
+        const n = Date.now(), t = n + timeLeft * 1000; 
+        displayTimeLeft(timeLeft); 
+        countdown = setInterval(() => { 
+            const s = Math.round((t - Date.now()) / 1000); 
+            if (s < 0) { 
                 clearInterval(countdown);
                 alertSound.play(); // Play sound first
                 alert("Time for a break!"); // Then show alert
-                logStudySession(appData.customMinutes * 60);
-                setTimer();
-                return;
-            }
-            timeLeft = s;
-            displayTimeLeft(s);
-        }, 1000)
+                logStudySession(appData.customMinutes * 60); 
+                setTimer(); 
+                return 
+            } 
+            timeLeft = s; 
+            displayTimeLeft(s) 
+        }, 1000) 
     }
     
     function pauseTimer() { clearInterval(countdown) }
