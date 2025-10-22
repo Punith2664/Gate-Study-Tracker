@@ -146,18 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const today=new Date(new Date().toISOString().slice(0,10));const lastLogin=history[uniqueDays-1];if((today-lastLogin)/(1000*3600*24)<2){currentStreak=tempStreak}
     document.getElementById('stats-current-streak').textContent=`${currentStreak} day${currentStreak!==1?'s':''}`;document.getElementById('stats-longest-streak').textContent=`${longestStreak} day${longestStreak!==1?'s':''}`;document.getElementById('stats-total-days').textContent=`${uniqueDays} day${uniqueDays!==1?'s':''}`}
     
-    // --- THIS IS THE CORRECTED AND VERIFIED FUNCTION ---
+    // Study Statistics
     function logStudySession(e){(appData.studySessions=appData.studySessions||[]).push({date:new Date().toISOString(),duration:e});updateStatsDisplay();saveData()}
     function formatTime(e){const t=Math.floor(e/3600),a=Math.floor(e%3600/60);return`${t}h ${a}m`}
+    
+    // --- THIS IS THE CORRECTED AND VERIFIED FUNCTION ---
     function updateStatsDisplay() {
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         
-        const sevenDaysAgo = new Date(); // Use a fresh Date object
+        const sevenDaysAgo = new Date(now); // Use a fresh Date object
         sevenDaysAgo.setDate(now.getDate() - 7);
         const sevenDaysAgoStart = sevenDaysAgo.getTime();
 
-        const thirtyDaysAgo = new Date(); // Use another fresh Date object
+        const thirtyDaysAgo = new Date(now); // Use another fresh Date object
         thirtyDaysAgo.setDate(now.getDate() - 30);
         const thirtyDaysAgoStart = thirtyDaysAgo.getTime();
 
@@ -165,9 +167,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
         (appData.studySessions || []).forEach(session => {
             const sessionDate = new Date(session.date).getTime();
-            if (sessionDate >= todayStart) todaySeconds += session.duration;
-            if (sessionDate >= sevenDaysAgoStart) weekSeconds += session.duration;
-            if (sessionDate >= thirtyDaysAgoStart) monthSeconds += session.duration;
+            // Important: Use separate "if" statements, not "else if"
+            if (sessionDate >= todayStart) {
+                todaySeconds += session.duration;
+            }
+            if (sessionDate >= sevenDaysAgoStart) {
+                weekSeconds += session.duration;
+            }
+            if (sessionDate >= thirtyDaysAgoStart) {
+                monthSeconds += session.duration;
+            }
             totalSeconds += session.duration;
         });
 
