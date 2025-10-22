@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-   const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -93,17 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
         updateWorkoutStats();
     }
     
-    // --- THE FIX IS IN THE TIMER SECTION ---
+    // Timer
     const timerDisplay = document.getElementById('timer-display'), startBtn = document.getElementById('start-timer'), pauseBtn = document.getElementById('pause-timer'), resetBtn = document.getElementById('reset-timer'), customMinutesInput = document.getElementById('custom-minutes');
     let countdown, timeLeft;
     function displayTimeLeft(s) { const m = Math.floor(s / 60), r = s % 60; timerDisplay.textContent = `${m}:${r < 10 ? '0' : ''}${r}`; document.title = `${m}:${r < 10 ? '0' : ''}${r}` }
     function setTimer() { pauseTimer(); appData.customMinutes = parseInt(customMinutesInput.value) || 25; timeLeft = appData.customMinutes * 60; displayTimeLeft(timeLeft); saveData(); }
     
     function startTimer() { 
-        // Prime the audio on user click to get permission from the browser
         alertSound.play().then(() => alertSound.pause()).catch(() => {});
         alertSound.currentTime = 0;
-
         pauseTimer(); 
         const n = Date.now(), t = n + timeLeft * 1000; 
         displayTimeLeft(timeLeft); 
@@ -111,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const s = Math.round((t - Date.now()) / 1000); 
             if (s < 0) { 
                 clearInterval(countdown);
-                alertSound.play(); // Play sound first
-                alert("Time for a break!"); // Then show alert
+                alertSound.play();
+                alert("Time for a break!"); 
                 logStudySession(appData.customMinutes * 60); 
                 setTimer(); 
                 return 
@@ -131,12 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function addTask(){const t=taskInput.value.trim();if(t==='')return;(appData.todos=appData.todos||[]).push({text:t,completed:false});taskInput.value='';renderTodos();saveData()}
     addTaskBtn.addEventListener('click',addTask);taskInput.addEventListener('keypress',(e)=>{if(e.key==='Enter')addTask()});
 
-    // Workout Tracker
+    // Workout Tracker & Stats
     const workoutCheckbox = document.getElementById('workout-checkbox');
     function updateWorkoutDisplay() { const t = new Date().toISOString().slice(0, 10); workoutCheckbox.checked = (appData.workouts || []).includes(t) }
     workoutCheckbox.addEventListener('change', () => { const t = new Date().toISOString().slice(0, 10); if (workoutCheckbox.checked) { if (!(appData.workouts || []).includes(t)) (appData.workouts = appData.workouts || []).push(t) } else { appData.workouts = (appData.workouts || []).filter(e => e !== t) } runAllRenders(); saveData(); });
-    
-    // Workout Progress Stats
     function updateWorkoutStats(){const history=[...new Set((appData.workouts||[]))].map(d=>new Date(d)).sort((a,b)=>a-b);const uniqueDays=history.length;if(uniqueDays===0){["stats-workout-current","stats-workout-longest","stats-workout-total"].forEach(id=>{if(document.getElementById(id))document.getElementById(id).textContent="0 days"});return}
     let longestStreak=0,currentStreak=0,tempStreak=1;if(uniqueDays>0)longestStreak=1;for(let i=1;i<uniqueDays;i++){const diff=(history[i]-history[i-1])/(1000*3600*24);if(diff===1){tempStreak++}else if(diff>1){tempStreak=1}
     if(tempStreak>longestStreak)longestStreak=tempStreak}
@@ -150,10 +146,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const today=new Date(new Date().toISOString().slice(0,10));const lastLogin=history[uniqueDays-1];if((today-lastLogin)/(1000*3600*24)<2){currentStreak=tempStreak}
     document.getElementById('stats-current-streak').textContent=`${currentStreak} day${currentStreak!==1?'s':''}`;document.getElementById('stats-longest-streak').textContent=`${longestStreak} day${longestStreak!==1?'s':''}`;document.getElementById('stats-total-days').textContent=`${uniqueDays} day${uniqueDays!==1?'s':''}`}
     
-    // Study Statistics
+    // --- THIS IS THE CORRECTED AND VERIFIED FUNCTION ---
     function logStudySession(e){(appData.studySessions=appData.studySessions||[]).push({date:new Date().toISOString(),duration:e});updateStatsDisplay();saveData()}
     function formatTime(e){const t=Math.floor(e/3600),a=Math.floor(e%3600/60);return`${t}h ${a}m`}
-    function updateStatsDisplay(){const e=new Date,t=new Date(e.getFullYear(),e.getMonth(),e.getDate()).getTime(),a=new Date(e);a.setDate(e.getDate()-7);const s=a.getTime(),n=new Date(e);n.setDate(e.getDate()-30);const d=n.getTime();let l=0,c=0,r=0,o=0;(appData.studySessions||[]).forEach(e=>{const a=new Date(e.date).getTime();a>=t&&(l+=e.duration),a>=s&&(c+=e.duration),a>=d&&(r+=e.duration),o+=e.duration});document.getElementById("stats-today").textContent=formatTime(l);document.getElementById("stats-week").textContent=formatTime(c);document.getElementById("stats-month").textContent=formatTime(r);document.getElementById("stats-total").textContent=formatTime(o)}
+    function updateStatsDisplay() {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        
+        const sevenDaysAgo = new Date(); // Use a fresh Date object
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        const sevenDaysAgoStart = sevenDaysAgo.getTime();
+
+        const thirtyDaysAgo = new Date(); // Use another fresh Date object
+        thirtyDaysAgo.setDate(now.getDate() - 30);
+        const thirtyDaysAgoStart = thirtyDaysAgo.getTime();
+
+        let todaySeconds = 0, weekSeconds = 0, monthSeconds = 0, totalSeconds = 0;
+        
+        (appData.studySessions || []).forEach(session => {
+            const sessionDate = new Date(session.date).getTime();
+            if (sessionDate >= todayStart) todaySeconds += session.duration;
+            if (sessionDate >= sevenDaysAgoStart) weekSeconds += session.duration;
+            if (sessionDate >= thirtyDaysAgoStart) monthSeconds += session.duration;
+            totalSeconds += session.duration;
+        });
+
+        document.getElementById("stats-today").textContent = formatTime(todaySeconds);
+        document.getElementById("stats-week").textContent = formatTime(weekSeconds);
+        document.getElementById("stats-month").textContent = formatTime(monthSeconds);
+        document.getElementById("stats-total").textContent = formatTime(totalSeconds);
+    }
 
     // Subject & Revision Logic
     const subjectContainer=document.getElementById('subject-container'),revisionList=document.getElementById('revision-list'),performanceChart=document.querySelector('.performance-chart'),chartPercentageLabel=document.getElementById('chart-percentage');
