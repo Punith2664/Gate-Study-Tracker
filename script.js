@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-     const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -180,10 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h4 class="h5 card-title mb-0">${name}</h4>
                             ${revisionHTML}
                         </div>
-                        <div class="progress mb-3" style="height: 5px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: ${percentage}%;" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: ${percentage}%;" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100">${percentage}%</div>
                         </div>
-                        <ul class="list-group list-group-flush flex-grow-1 chapter-list" style="max-height: 200px; overflow-y: auto;"></ul>
+                        <ul class="list-group list-group-flush flex-grow-1 chapter-list mt-3" style="max-height: 200px; overflow-y: auto;"></ul>
                         <div class="input-group mt-3">
                             <input type="text" class="form-control form-control-sm" placeholder="Add new chapter...">
                             <button class="btn btn-sm btn-outline-primary">Add</button>
