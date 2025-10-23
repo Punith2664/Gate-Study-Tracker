@@ -149,46 +149,83 @@ document.addEventListener('DOMContentLoaded', () => {
     // Study Statistics
     function logStudySession(e){(appData.studySessions=appData.studySessions||[]).push({date:new Date().toISOString(),duration:e});updateStatsDisplay();saveData()}
     function formatTime(e){const t=Math.floor(e/3600),a=Math.floor(e%3600/60);return`${t}h ${a}m`}
-    
-    // --- THIS IS THE CORRECTED AND VERIFIED FUNCTION ---
-    function updateStatsDisplay() {
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-        
-        const sevenDaysAgo = new Date(now); // Use a fresh Date object
-        sevenDaysAgo.setDate(now.getDate() - 7);
-        const sevenDaysAgoStart = sevenDaysAgo.getTime();
-
-        const thirtyDaysAgo = new Date(now); // Use another fresh Date object
-        thirtyDaysAgo.setDate(now.getDate() - 30);
-        const thirtyDaysAgoStart = thirtyDaysAgo.getTime();
-
-        let todaySeconds = 0, weekSeconds = 0, monthSeconds = 0, totalSeconds = 0;
-        
-        (appData.studySessions || []).forEach(session => {
-            const sessionDate = new Date(session.date).getTime();
-            // Important: Use separate "if" statements, not "else if"
-            if (sessionDate >= todayStart) {
-                todaySeconds += session.duration;
-            }
-            if (sessionDate >= sevenDaysAgoStart) {
-                weekSeconds += session.duration;
-            }
-            if (sessionDate >= thirtyDaysAgoStart) {
-                monthSeconds += session.duration;
-            }
-            totalSeconds += session.duration;
-        });
-
-        document.getElementById("stats-today").textContent = formatTime(todaySeconds);
-        document.getElementById("stats-week").textContent = formatTime(weekSeconds);
-        document.getElementById("stats-month").textContent = formatTime(monthSeconds);
-        document.getElementById("stats-total").textContent = formatTime(totalSeconds);
-    }
+    function updateStatsDisplay(){const e=new Date,t=new Date(e.getFullYear(),e.getMonth(),e.getDate()).getTime(),a=new Date(e);a.setDate(e.getDate()-7);const s=a.getTime(),n=new Date(e);n.setDate(e.getDate()-30);const d=n.getTime();let l=0,c=0,r=0,o=0;(appData.studySessions||[]).forEach(e=>{const a=new Date(e.date).getTime();a>=t&&(l+=e.duration),a>=s&&(c+=e.duration),a>=d&&(r+=e.duration),o+=e.duration});document.getElementById("stats-today").textContent=formatTime(l);document.getElementById("stats-week").textContent=formatTime(c);document.getElementById("stats-month").textContent=formatTime(r);document.getElementById("stats-total").textContent=formatTime(o)}
 
     // Subject & Revision Logic
     const subjectContainer=document.getElementById('subject-container'),revisionList=document.getElementById('revision-list'),performanceChart=document.querySelector('.performance-chart'),chartPercentageLabel=document.getElementById('chart-percentage');
     function renderRevisionsDue(){revisionList.innerHTML='';const e=new Date;e.setHours(23,59,59,999);let t=0;Object.keys(appData.subjects||{}).forEach(a=>{const s=appData.subjects[a];if(s.dueDate&&new Date(s.dueDate)<=e){const e=document.createElement("li");e.className="list-group-item d-flex justify-content-between",e.innerHTML=`<span>${a}</span> <span class="text-muted small">(Revision ${s.revisionStage})</span>`,revisionList.appendChild(e),t++}}),0===t&&(revisionList.innerHTML='<li class="list-group-item text-muted">No revisions due today. Well done!</li>')}
-    function renderSubjectsAndProgress(){subjectContainer.innerHTML='';let totalChapters=0,completedChapters=0;subjectNames.forEach(name=>{const subject=appData.subjects[name];const subjectCol=document.createElement('div');subjectCol.className='col-lg-4 col-md-6';const chapters=subject.chapters||[];completedChapters+=chapters.filter(c=>c.completed).length;totalChapters+=chapters.length;let revisionHTML=(subject.revisionStage>0)?`<span class="badge rounded-pill bg-primary">${subject.revisionStage>revisionIntervals.length?'Done':`R${subject.revisionStage}`}</span>`:'';subjectCol.innerHTML=`<div class="card h-100"><div class="card-body d-flex flex-column"><div class="d-flex justify-content-between align-items-center mb-3"><h4 class="h5 card-title mb-0">${name}</h4>${revisionHTML}</div><ul class="list-group list-group-flush flex-grow-1 chapter-list" style="max-height: 200px; overflow-y: auto;"></ul><div class="input-group mt-3"><input type="text" class="form-control form-control-sm" placeholder="Add new chapter..."><button class="btn btn-sm btn-outline-primary">Add</button></div></div></div>`;const chapterList=subjectCol.querySelector('.chapter-list');chapters.forEach((chapter,index)=>{const li=document.createElement('li');li.className='list-group-item d-flex justify-content-between align-items-center px-0';li.innerHTML=`<div class="form-check"><input class="form-check-input" type="checkbox" id="${name.replace(/\s+/g,'-')}-${index}" ${chapter.completed?'checked':''}><label class="form-check-label ${chapter.completed?'text-decoration-line-through text-muted':''}" for="${name.replace(/\s+/g,'-')}-${index}">${chapter.text}</label></div><button class="btn-close btn-sm delete-chapter-btn"></button>`;li.querySelector('.form-check-input').onchange=()=>{appData.subjects[name].chapters[index].completed=!appData.subjects[name].chapters[index].completed;runAllRenders();saveData()};li.querySelector('.delete-chapter-btn').onclick=()=>{appData.subjects[name].chapters.splice(index,1);runAllRenders();saveData()};chapterList.appendChild(li)});subjectCol.querySelector('.input-group button').onclick=()=>{const input=subjectCol.querySelector('.input-group input');if(input.value.trim()){(appData.subjects[name].chapters=appData.subjects[name].chapters||[]).push({text:input.value.trim(),completed:false});input.value='';runAllRenders();saveData()}};const allChaptersDone=chapters.length>0&&chapters.every(c=>c.completed);if(allChaptersDone){let btnHTML='';if(subject.revisionStage===0)btnHTML=`<button class="btn btn-primary w-100 mt-3 subject-revision-btn" data-subject-name="${name}">Start Revision Cycle</button>`;else if(subject.revisionStage<=revisionIntervals.length)btnHTML=`<button class="btn btn-primary w-100 mt-3 subject-revision-btn" data-subject-name="${name}">Finish Revision ${subject.revisionStage}</button>`;if(btnHTML){const actionsDiv=document.createElement('div');actionsDiv.innerHTML=btnHTML;actionsDiv.querySelector('.subject-revision-btn').onclick=(e)=>{const subjectName=e.target.getAttribute('data-subject-name');appData.subjects[subjectName].revisionStage++;const nextInterval=revisionIntervals[appData.subjects[subjectName].revisionStage-1];if(nextInterval){const d=new Date();d.setDate(d.getDate()+nextInterval);appData.subjects[subjectName].dueDate=d.toISOString()}else{appData.subjects[subjectName].dueDate=null}
-    runAllRenders();saveData()};subjectCol.querySelector('.card-body').appendChild(actionsDiv)}}
-    subjectContainer.appendChild(subjectCol)});const overallPercentage=totalChapters===0?0:Math.round((completedChapters/totalChapters)*100);const angle=overallPercentage*3.6;performanceChart.style.background=`conic-gradient(#39ff14 ${angle}deg, #444 ${angle}deg)`;chartPercentageLabel.textContent=`${overallPercentage}%`}});
+    
+    // --- THIS IS THE CORRECTED AND VERIFIED FUNCTION ---
+    function renderSubjectsAndProgress(){
+        subjectContainer.innerHTML='';
+        let totalChapters=0,completedChapters=0;
+        subjectNames.forEach(name=>{
+            const subject=appData.subjects[name];
+            const subjectCol=document.createElement('div');
+            subjectCol.className='col-lg-4 col-md-6';
+            
+            const chapters = subject.chapters || [];
+            const subjectCompletedChapters = chapters.filter(c => c.completed).length;
+            const percentage = chapters.length > 0 ? Math.round((subjectCompletedChapters / chapters.length) * 100) : 0;
+
+            completedChapters += subjectCompletedChapters;
+            totalChapters += chapters.length;
+
+            let revisionHTML=(subject.revisionStage>0)?`<span class="badge rounded-pill bg-primary">${subject.revisionStage>revisionIntervals.length?'Done':`R${subject.revisionStage}`}</span>`:'';
+            
+            subjectCol.innerHTML=`
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="h5 card-title mb-0">${name}</h4>
+                            ${revisionHTML}
+                        </div>
+                        <div class="progress mb-3" style="height: 5px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: ${percentage}%;" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <ul class="list-group list-group-flush flex-grow-1 chapter-list" style="max-height: 200px; overflow-y: auto;"></ul>
+                        <div class="input-group mt-3">
+                            <input type="text" class="form-control form-control-sm" placeholder="Add new chapter...">
+                            <button class="btn btn-sm btn-outline-primary">Add</button>
+                        </div>
+                    </div>
+                </div>`;
+            const chapterList=subjectCol.querySelector('.chapter-list');
+            chapters.forEach((chapter,index)=>{
+                const li=document.createElement('li');
+                li.className='list-group-item d-flex justify-content-between align-items-center px-0';
+                li.innerHTML=`<div class="form-check"><input class="form-check-input" type="checkbox" id="${name.replace(/\s+/g,'-')}-${index}" ${chapter.completed?'checked':''}><label class="form-check-label ${chapter.completed?'text-decoration-line-through text-muted':''}" for="${name.replace(/\s+/g,'-')}-${index}">${chapter.text}</label></div><button class="btn-close btn-sm delete-chapter-btn"></button>`;
+                li.querySelector('.form-check-input').onchange=()=>{appData.subjects[name].chapters[index].completed=!appData.subjects[name].chapters[index].completed;runAllRenders();saveData()};
+                li.querySelector('.delete-chapter-btn').onclick=()=>{appData.subjects[name].chapters.splice(index,1);runAllRenders();saveData()};
+                chapterList.appendChild(li);
+            });
+            subjectCol.querySelector('.input-group button').onclick=()=>{
+                const input=subjectCol.querySelector('.input-group input');
+                if(input.value.trim()){(appData.subjects[name].chapters=appData.subjects[name].chapters||[]).push({text:input.value.trim(),completed:false});input.value='';runAllRenders();saveData()}
+            };
+            const allChaptersDone=chapters.length>0&&chapters.every(c=>c.completed);
+            if(allChaptersDone){
+                let btnHTML='';
+                if(subject.revisionStage===0)btnHTML=`<button class="btn btn-primary w-100 mt-3 subject-revision-btn" data-subject-name="${name}">Start Revision Cycle</button>`;
+                else if(subject.revisionStage<=revisionIntervals.length)btnHTML=`<button class="btn btn-primary w-100 mt-3 subject-revision-btn" data-subject-name="${name}">Finish Revision ${subject.revisionStage}</button>`;
+                if(btnHTML){
+                    const actionsDiv=document.createElement('div');
+                    actionsDiv.innerHTML=btnHTML;
+                    actionsDiv.querySelector('.subject-revision-btn').onclick=(e)=>{
+                        const subjectName=e.target.getAttribute('data-subject-name');
+                        appData.subjects[subjectName].revisionStage++;
+                        const nextInterval=revisionIntervals[appData.subjects[subjectName].revisionStage-1];
+                        if(nextInterval){const d=new Date();d.setDate(d.getDate()+nextInterval);appData.subjects[subjectName].dueDate=d.toISOString()}else{appData.subjects[subjectName].dueDate=null}
+                        runAllRenders();saveData();
+                    };
+                    subjectCol.querySelector('.card-body').appendChild(actionsDiv);
+                }
+            }
+            subjectContainer.appendChild(subjectCol);
+        });
+        const overallPercentage=totalChapters===0?0:Math.round((completedChapters/totalChapters)*100);
+        const angle=overallPercentage*3.6;
+        performanceChart.style.background=`conic-gradient(#39ff14 ${angle}deg, #444 ${angle}deg)`;
+        chartPercentageLabel.textContent=`${overallPercentage}%`;
+    }
+});
