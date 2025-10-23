@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ---
-    const firebaseConfig = {
+     const firebaseConfig = {
   apiKey: "AIzaSyDgcAaDL5tPTRb0D0WH08CbjB7HsgL7udw",
   authDomain: "gate-study-tracker-9a588.firebaseapp.com",
   projectId: "gate-study-tracker-9a588",
@@ -155,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const subjectContainer=document.getElementById('subject-container'),revisionList=document.getElementById('revision-list'),performanceChart=document.querySelector('.performance-chart'),chartPercentageLabel=document.getElementById('chart-percentage');
     function renderRevisionsDue(){revisionList.innerHTML='';const e=new Date;e.setHours(23,59,59,999);let t=0;Object.keys(appData.subjects||{}).forEach(a=>{const s=appData.subjects[a];if(s.dueDate&&new Date(s.dueDate)<=e){const e=document.createElement("li");e.className="list-group-item d-flex justify-content-between",e.innerHTML=`<span>${a}</span> <span class="text-muted small">(Revision ${s.revisionStage})</span>`,revisionList.appendChild(e),t++}}),0===t&&(revisionList.innerHTML='<li class="list-group-item text-muted">No revisions due today. Well done!</li>')}
     
-    // --- THIS IS THE CORRECTED AND VERIFIED FUNCTION ---
     function renderSubjectsAndProgress(){
         subjectContainer.innerHTML='';
         let totalChapters=0,completedChapters=0;
@@ -173,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let revisionHTML=(subject.revisionStage>0)?`<span class="badge rounded-pill bg-primary">${subject.revisionStage>revisionIntervals.length?'Done':`R${subject.revisionStage}`}</span>`:'';
             
+            // --- THE FIX IS HERE ---
             subjectCol.innerHTML=`
                 <div class="card h-100">
                     <div class="card-body d-flex flex-column">
@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>`;
+
             const chapterList=subjectCol.querySelector('.chapter-list');
             chapters.forEach((chapter,index)=>{
                 const li=document.createElement('li');
